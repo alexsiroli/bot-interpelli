@@ -22,7 +22,11 @@ esecuzione:
   # "il sito e' cambiato / non risponde piu'". Serve contro il fallimento silenzioso.
   run_vuoti_prima_di_allerta: 3
   # Ora italiana a partire dalla quale il primo run della giornata manda il digest.
-  ora_digest: 7
+  ora_digest: 13
+  # Giorni in cui mandare il digest (1 = lunedi ... 7 = domenica): nel weekend niente
+  # riepilogo. Gli avvisi sui nuovi interpelli arrivano comunque tutti i giorni, perche'
+  # un interpello pubblicato di sabato spesso scade il lunedi mattina.
+  giorni_digest: [1, 2, 3, 4, 5]
 
 province:
   # categoria_preferita: regex (case-insensitive) sul NOME della categoria WordPress.

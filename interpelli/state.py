@@ -145,8 +145,17 @@ class Stato:
 
     # --- digest del mattino -------------------------------------------------------
 
-    def digest_dovuto(self, adesso: datetime, ora_digest: int) -> bool:
-        """Vero al primo run della giornata dopo l'ora indicata (ora italiana)."""
+    def digest_dovuto(
+        self, adesso: datetime, ora_digest: int, giorni: list[int] | None = None
+    ) -> bool:
+        """Vero al primo run della giornata dopo l'ora indicata (ora italiana).
+
+        `giorni` sono i giorni ammessi in formato ISO (1 = lunedi ... 7 = domenica):
+        nei giorni esclusi il digest non parte e non viene nemmeno segnato come fatto,
+        quindi il primo giorno utile successivo riparte regolarmente.
+        """
+        if giorni and adesso.isoweekday() not in giorni:
+            return False
         if adesso.hour < ora_digest:
             return False
         return self.ultimo_digest != adesso.date().isoformat()

@@ -99,15 +99,33 @@ def test_pulisci_aperti(percorso):
     assert list(stato.aperti) == ["forli-cesena:1"]
 
 
-def test_digest_una_volta_al_giorno_dopo_le_sette(percorso):
+def test_digest_una_volta_al_giorno_dopo_l_ora_stabilita(percorso):
     stato = Stato.carica(percorso)
-    presto = ADESSO.replace(hour=5)
-    assert not stato.digest_dovuto(presto, 7)
-    assert stato.digest_dovuto(ADESSO, 7)
+    mezzogiorno = ADESSO.replace(hour=12)
+    tredici = ADESSO.replace(hour=13)
+    assert not stato.digest_dovuto(mezzogiorno, 13)
+    assert stato.digest_dovuto(tredici, 13)
 
-    stato.segna_digest(ADESSO.date())
-    assert not stato.digest_dovuto(ADESSO.replace(hour=13), 7)
-    assert stato.digest_dovuto(ADESSO + timedelta(days=1), 7)
+    stato.segna_digest(tredici.date())
+    assert not stato.digest_dovuto(tredici.replace(hour=16), 13)
+    assert stato.digest_dovuto(tredici + timedelta(days=1), 13)
+
+
+def test_digest_saltato_nel_weekend(percorso):
+    """15/09/2026 e' un martedi: sabato e domenica il riepilogo non parte."""
+    stato = Stato.carica(percorso)
+    feriali = [1, 2, 3, 4, 5]
+    martedi = ADESSO.replace(hour=13)
+    sabato = martedi + timedelta(days=4)
+    domenica = martedi + timedelta(days=5)
+    lunedi = martedi + timedelta(days=6)
+
+    assert sabato.isoweekday() == 6 and domenica.isoweekday() == 7
+    assert stato.digest_dovuto(martedi, 13, feriali)
+    assert not stato.digest_dovuto(sabato, 13, feriali)
+    assert not stato.digest_dovuto(domenica, 13, feriali)
+    # Saltando il weekend non si segna niente, quindi il lunedi riparte regolarmente.
+    assert stato.digest_dovuto(lunedi, 13, feriali)
 
 
 def test_allerta_dopo_n_run_a_vuoto(percorso):

@@ -38,7 +38,8 @@ A-041 · Scienze e tecnologie informatiche
    gh workflow run "Controllo interpelli"   # oppure, in locale, con il .env:
    python -m interpelli.main --test-telegram
    ```
-5. **Fatto.** Il workflow gira da solo alle 7, 10, 13, 16 e 19 (ora italiana legale).
+5. **Fatto.** Il workflow gira da solo sei volte al giorno (7, 10, 13, 14, 16, 19 ora
+   legale italiana; d'inverno un'ora prima) e il riepilogo arriva alle 13:00 nei giorni feriali.
 
 > Il primo allineamento (`--backfill`) e' gia' stato fatto: gli interpelli pubblicati
 > prima dell'installazione sono marcati come visti e non verranno rimandati. Se cambi
@@ -73,9 +74,15 @@ copiato da `.env.example`. Il `.env` e' in `.gitignore` e il token non viene mai
 4. **Deduplica.** `state/seen.json` tiene le chiavi `provincia:id-post`. Una chiave si
    scrive **solo dopo un invio riuscito**: se Telegram e' irraggiungibile l'interpello
    viene riprovato al giro dopo invece di essere perso.
-5. **Digest.** Al primo run dopo le 7:00 arriva il riepilogo degli interpelli ancora
-   aperti gia' segnalati nei giorni precedenti. Se non c'e' niente di aperto e niente di
-   nuovo, il bot tace: nessun messaggio "nessuna novita'".
+5. **Digest.** Alle **13:00 dei giorni feriali** (primo run utile dopo quell'ora) arriva il
+   riepilogo degli interpelli **ancora aperti** gia' segnalati nei giorni precedenti: e' un
+   promemoria, quindi lo stesso interpello ricompare finche' la sua scadenza non passa.
+   Quelli di cui il bot non riesce a leggere la scadenza restano in lista 7 giorni.
+   Nel weekend il digest non parte (gli avvisi sui nuovi interpelli si', tutti i giorni).
+   Se non c'e' niente di aperto e niente di nuovo, il bot tace: nessun messaggio
+   "nessuna novita'". Ora e giorni si cambiano in `config.yaml` (`ora_digest`,
+   `giorni_digest`); il cron include apposta sia le 11 che le 12 UTC perche' le 13:00
+   italiane cadano giuste sia con l'ora legale sia con quella solare.
 6. **Allerta.** Se una provincia non restituisce piu' nessun post per 3 run consecutivi
    arriva un avviso: il fallimento silenzioso (sito cambiato, categoria rinominata) e' il
    rischio peggiore per un bot come questo.
@@ -138,9 +145,9 @@ fastidio, aggiungi `'\ba[-\s]?0?66\b'` alle `esclusioni`.
      al posto del `GITHUB_TOKEN` e i suoi commit contano come attivita';
   2. oppure, quando arriva la mail di preavviso di GitHub, lanciare a mano
      `gh workflow run "Controllo interpelli"` o fare un commit qualsiasi.
-- **Consumo Actions.** Circa 5 run al giorno da ~40 secondi: ~150 minuti al mese, dentro i
+- **Consumo Actions.** Sei run al giorno da ~30 secondi: ~100 minuti al mese, dentro i
   2000 gratuiti dei repository privati.
-- **Test.** `python -m pytest` (108 test). Le fixture in `tests/fixtures/` sono risposte
+- **Test.** `python -m pytest` (109 test). Le fixture in `tests/fixtures/` sono risposte
   vere dei siti scaricate il 15/09/2026, compresi i casi che devono essere **scartati**
   (A-042, A-044, BI02, graduatoria DSGA) e due interpelli A-041 veri.
 

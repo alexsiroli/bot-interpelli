@@ -206,8 +206,9 @@ def comando_run(conf: Config, province: list[Provincia], modalita: str) -> int:
 
     # Digest del mattino: solo roba gia' segnalata nei giorni precedenti e ancora aperta.
     if modalita != "backfill":
-        ora_digest = int(conf.esecuzione.get("ora_digest", 7))
-        if stato.digest_dovuto(adesso, ora_digest):
+        ora_digest = int(conf.esecuzione.get("ora_digest", 13))
+        giorni_digest = conf.esecuzione.get("giorni_digest") or None
+        if stato.digest_dovuto(adesso, ora_digest, giorni_digest):
             aperti = [v for v in stato.aperti_non_scaduti(adesso) if v["chiave"] not in chiavi_di_oggi]
             if aperti:
                 log.info("digest del mattino: %d interpelli ancora aperti", len(aperti))

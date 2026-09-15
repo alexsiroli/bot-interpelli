@@ -2,12 +2,15 @@ name: Controllo interpelli
 
 on:
   schedule:
-    # ATTENZIONE: il cron di GitHub Actions e' in UTC.
-    # 5,8,11,14,17 UTC = 7/10/13/16/19 ora legale italiana (CEST).
-    # D'inverno (CET) gli stessi orari diventano 6/9/12/15/18: va benissimo lo stesso,
-    # non c'e' nessuna logica che dipenda dall'orario esatto di esecuzione.
-    # GitHub puo' inoltre ritardare i job schedulati di parecchi minuti negli orari di punta.
-    - cron: "0 5,8,11,14,17 * * *"
+    # ATTENZIONE: il cron di GitHub Actions e' in UTC e non conosce l'ora legale.
+    #   estate (CEST, UTC+2): 5,8,11,12,14,17 UTC = 7 / 10 / 13 / 14 / 16 / 19 italiane
+    #   inverno (CET, UTC+1): gli stessi orari = 6 /  9 / 12 / 13 / 15 / 18 italiane
+    # Ci sono sia le 11 che le 12 UTC apposta: cosi' in entrambe le stagioni esiste un run
+    # esattamente alle 13:00 italiane, che e' l'orario del digest (config.yaml: ora_digest).
+    # Il digest parte al primo run dopo quell'ora, quindi non viene mandato due volte.
+    # GitHub puo' ritardare i job schedulati di parecchi minuti negli orari di punta:
+    # nessuna logica dipende dall'orario esatto di esecuzione.
+    - cron: "0 5,8,11,12,14,17 * * *"
   workflow_dispatch:
 
 # Un run alla volta: due run sovrapposti si darebbero battaglia sul commit di seen.json.
