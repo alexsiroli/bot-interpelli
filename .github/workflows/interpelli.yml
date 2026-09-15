@@ -14,8 +14,9 @@ on:
   workflow_dispatch:
 
 # Un run alla volta: due run sovrapposti si darebbero battaglia sul commit di seen.json.
+# Stesso gruppo del workflow dei comandi: scrivono entrambi su state/seen.json.
 concurrency:
-  group: interpelli
+  group: stato-bot
   cancel-in-progress: false
 
 permissions:
@@ -59,4 +60,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/seen.json
           git commit -m "chore(stato): aggiorna gli interpelli gia' visti [skip ci]"
+          # Il workflow dei comandi puo' aver spinto nel frattempo: ci si riallinea.
+          git pull --rebase --autostash origin main
           git push

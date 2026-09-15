@@ -5,6 +5,8 @@
     python -m interpelli.main --backfill       marca tutto come visto, non invia nulla
     python -m interpelli.main --test-telegram  manda un messaggio di prova
     python -m interpelli.main --discover       ricognizione dei siti (quale metodo funziona)
+    python -m interpelli.main --comandi        esegue i comandi arrivati in chat (una passata)
+    python -m interpelli.main --ascolta        risponde ai comandi in tempo reale
 """
 
 from __future__ import annotations
@@ -16,6 +18,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from . import __version__
+from .comandi import MENU, processa_comandi
 from .config import PERCORSO_STATO, Config, Provincia, carica_config, segreti_telegram
 from .fetch import Esito, crea_sessione, post_da_rest, recupera, risolvi_categoria, scopri_feed_categoria
 from .filters import FiltroClassi
@@ -225,6 +228,16 @@ def comando_run(conf: Config, province: list[Provincia], modalita: str) -> int:
                 log.info("digest del mattino: niente di aperto, non mando nulla")
             stato.segna_digest(adesso.date())
 
+    # I comandi arrivati in chat si smaltiscono anche qui: non costa una riga di piu' di
+    # CI e chi scrive /digest poco prima di un controllo viene servito subito.
+    if telegram is not None:
+        try:
+            eseguiti = processa_comandi(conf, stato, telegram, sessione)
+            if eseguiti:
+                log.info("%d comando/i eseguito/i dalla chat", eseguiti)
+        except Exception as e:  # noqa: BLE001 - i comandi non devono far fallire il controllo
+            log.warning("comandi non elaborati: %s", e)
+
     tolti = stato.prune(int(conf.esecuzione.get("ritenzione_mesi", 12)), adesso)
     stato.pulisci_aperti(adesso)
     if tolti:
@@ -243,6 +256,40 @@ def comando_run(conf: Config, province: list[Provincia], modalita: str) -> int:
     return 1 if falliti else 0
 
 
+def comando_comandi(conf: Config, ascolta: bool = False) -> int:
+    """Legge ed esegue i comandi scritti in chat.
+
+    Con ascolta=False fa una passata sola (e' quello che lancia il workflow schedulato);
+    con ascolta=True resta in long polling e risponde all'istante, finche' non si preme
+    Ctrl+C: comodo da tenere aperto sul PC quando si sta seguendo un interpello.
+    """
+    token, chat_id = segreti_telegram()
+    if not token or not chat_id:
+        log.error("TELEGRAM_BOT_TOKEN e TELEGRAM_CHAT_ID non configurati (vedi README)")
+        return 1
+    telegram = Telegram(token, chat_id, timeout=float(conf.http.get("timeout", 10)),
+                        limite=int(conf.telegram.get("max_caratteri", 4096)))
+    sessione = crea_sessione(conf)
+    stato = Stato.carica(PERCORSO_STATO)
+
+    if not ascolta:
+        eseguiti = processa_comandi(conf, stato, telegram, sessione)
+        stato.salva()
+        log.info("comandi eseguiti: %d", eseguiti)
+        return 0
+
+    log.info("in ascolto dei comandi (Ctrl+C per uscire)")
+    try:
+        while True:
+            eseguiti = processa_comandi(conf, stato, telegram, sessione, attesa=30)
+            if eseguiti:
+                stato.salva()
+    except KeyboardInterrupt:
+        stato.salva()
+        log.info("ascolto interrotto, stato salvato")
+    return 0
+
+
 def comando_test_telegram(conf: Config) -> int:
     token, chat_id = segreti_telegram()
     if not token or not chat_id:
@@ -254,6 +301,8 @@ def comando_test_telegram(conf: Config) -> int:
         log.error("token non valido: %s", dettaglio)
         return 1
     log.info("bot riconosciuto: %s", dettaglio)
+    if telegram.imposta_menu_comandi(MENU):
+        log.info("menu dei comandi registrato su Telegram: %s", ", ".join("/" + n for n, _ in MENU))
     adesso = datetime.now(ZoneInfo(conf.fuso))
     testo = (
         "✅ <b>bot-interpelli</b> e' configurato correttamente.\n"
@@ -280,6 +329,10 @@ def costruisci_parser() -> argparse.ArgumentParser:
     gruppo.add_argument("--test-telegram", action="store_true", help="manda un messaggio di prova")
     gruppo.add_argument("--discover", action="store_true",
                         help="ricognizione: quale metodo e quale URL funzionano per ogni sito")
+    gruppo.add_argument("--comandi", action="store_true",
+                        help="legge ed esegue i comandi arrivati in chat (una passata sola)")
+    gruppo.add_argument("--ascolta", action="store_true",
+                        help="resta in ascolto dei comandi e risponde subito (Ctrl+C per uscire)")
     parser.add_argument("--provincia", help="limita l'esecuzione a una provincia (anche parziale)")
     parser.add_argument("-v", "--verboso", action="store_true", help="log di debug")
     return parser
@@ -297,6 +350,10 @@ def main(argv: list[str] | None = None) -> int:
         return comando_discover(conf, province)
     if argomenti.test_telegram:
         return comando_test_telegram(conf)
+    if argomenti.comandi:
+        return comando_comandi(conf, ascolta=False)
+    if argomenti.ascolta:
+        return comando_comandi(conf, ascolta=True)
     if argomenti.backfill:
         return comando_run(conf, province, "backfill")
     if argomenti.dry_run:

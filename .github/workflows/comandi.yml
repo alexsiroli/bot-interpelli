@@ -1,0 +1,58 @@
+name: Comandi in chat
+
+on:
+  schedule:
+    # Ogni 30 minuti dalle 5 alle 18 UTC = 7:00-20:30 italiane d'estate (6:00-19:30 d'inverno).
+    # Fuori da questa fascia i comandi restano in coda su Telegram e vengono serviti al
+    # primo giro utile: Telegram li conserva 24 ore.
+    # Perche' 30 minuti e non 5: ogni run di Actions e' fatturato arrotondato al minuto,
+    # quindi la frequenza e' il costo. 30 minuti = ~26 run al giorno = ~780 minuti al mese,
+    # che stanno nei 2000 gratuiti insieme al workflow di controllo.
+    - cron: "*/30 5-18 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: stato-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  rispondi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.STATE_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installa le dipendenze
+        run: pip install -r requirements.txt
+
+      - name: Esegui i comandi arrivati in chat
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m interpelli.main --comandi
+
+      - name: Committa lo stato aggiornato
+        if: always()
+        run: |
+          if git diff --quiet -- state/seen.json; then
+            echo "Nessun comando ricevuto, stato invariato."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/seen.json
+          git commit -m "chore(stato): comandi elaborati [skip ci]"
+          # I due workflow possono scrivere sullo stesso file a pochi secondi di distanza:
+          # si riallinea prima di spingere, invece di far fallire il run.
+          git pull --rebase --autostash origin main
+          git push

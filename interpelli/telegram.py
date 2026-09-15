@@ -7,6 +7,7 @@ perche' requests mette l'URL completo nel messaggio delle eccezioni.
 from __future__ import annotations
 
 import html
+import json
 import logging
 import time
 from datetime import datetime
@@ -166,6 +167,41 @@ class Telegram:
                 return False
             time.sleep(2 * tentativo)
         return False
+
+    def leggi_aggiornamenti(self, offset: int | None = None, attesa: int = 0) -> list[dict]:
+        """getUpdates: i messaggi arrivati da quando li abbiamo letti l'ultima volta.
+
+        `attesa` > 0 attiva il long polling (la richiesta resta aperta finche' non arriva
+        qualcosa): si usa in modalita' --ascolta, mentre il workflow schedulato passa 0.
+        """
+        url = f"https://api.telegram.org/bot{self._token}/getUpdates"
+        parametri: dict[str, int] = {"timeout": attesa}
+        if offset is not None:
+            parametri["offset"] = offset
+        try:
+            risposta = self.sessione.get(url, params=parametri, timeout=self.timeout + attesa)
+        except requests.RequestException as e:
+            log.warning("lettura dei comandi fallita: %s", self._maschera(str(e)))
+            return []
+        if risposta.status_code != 200:
+            log.warning("getUpdates ha risposto %s", risposta.status_code)
+            return []
+        return risposta.json().get("result", []) or []
+
+    def imposta_menu_comandi(self, comandi: list[tuple[str, str]]) -> bool:
+        """setMyCommands: fa comparire il menu dei comandi accanto alla casella di testo."""
+        url = f"https://api.telegram.org/bot{self._token}/setMyCommands"
+        payload = {
+            "commands": json.dumps(
+                [{"command": nome, "description": descrizione} for nome, descrizione in comandi]
+            )
+        }
+        try:
+            risposta = self.sessione.post(url, data=payload, timeout=self.timeout)
+        except requests.RequestException as e:
+            log.warning("setMyCommands fallito: %s", self._maschera(str(e)))
+            return False
+        return risposta.status_code == 200
 
     def verifica(self) -> tuple[bool, str]:
         """getMe: conferma che il token e' valido, senza mandare niente in chat."""

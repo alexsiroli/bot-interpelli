@@ -155,9 +155,13 @@ def _id_da_guid(guid: str, link: str) -> str:
 
 
 def post_da_rest(
-    sessione: requests.Session, provincia: Provincia, categoria_id: int, conf: Config
+    sessione: requests.Session,
+    provincia: Provincia,
+    categoria_id: int,
+    conf: Config,
+    quanti: int | None = None,
 ) -> list[Post]:
-    quanti = int(conf.http.get("max_post_per_provincia", 20))
+    quanti = quanti or int(conf.http.get("max_post_per_provincia", 20))
     url = (
         f"{provincia.base_url}/wp-json/wp/v2/posts?categories={categoria_id}"
         f"&per_page={quanti}&_fields=id,date,link,title,content"
@@ -236,9 +240,16 @@ def post_da_feed(
 
 
 def recupera(
-    sessione: requests.Session, provincia: Provincia, conf: Config, oggi: datetime | None = None
+    sessione: requests.Session,
+    provincia: Provincia,
+    conf: Config,
+    oggi: datetime | None = None,
+    quanti: int | None = None,
 ) -> Esito:
     """Prova i tre metodi in ordine e restituisce il primo che porta a casa dei post.
+
+    `quanti` alza il numero di post richiesti rispetto al valore di config.yaml: serve al
+    comando /all, che deve coprire sette giorni interi e non solo l'ultima manciata di post.
 
     Non solleva mai: un sito rotto diventa un Esito con errore, cosi' il run continua
     sulle altre province e lo stato di questa resta invariato (spec §6).
@@ -249,7 +260,7 @@ def recupera(
     try:
         categoria = risolvi_categoria(sessione, provincia, conf, oggi)
         if categoria:
-            post = post_da_rest(sessione, provincia, categoria["id"], conf)
+            post = post_da_rest(sessione, provincia, categoria["id"], conf, quanti)
             if post:
                 esito.metodo = METODO_REST
                 esito.dettaglio = f"categoria {categoria['id']} \"{categoria['name']}\" ({categoria['criterio']})"

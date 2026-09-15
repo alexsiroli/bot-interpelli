@@ -32,6 +32,9 @@ class Stato:
         self.ultimo_digest: str | None = meta.get("ultimo_digest")
         self.run_vuoti: dict[str, int] = meta.get("run_vuoti", {})
         self.allerta_inviata: dict[str, bool] = meta.get("allerta_inviata", {})
+        # Id dell'ultimo comando Telegram gia' eseguito: senza questo, a ogni run il bot
+        # rileggerebbe gli stessi comandi e risponderebbe all'infinito.
+        self.ultimo_update_id: int | None = meta.get("ultimo_update_id")
 
     # --- caricamento e salvataggio ------------------------------------------------
 
@@ -63,6 +66,7 @@ class Stato:
                 "ultimo_digest": self.ultimo_digest,
                 "run_vuoti": self.run_vuoti,
                 "allerta_inviata": self.allerta_inviata,
+                "ultimo_update_id": self.ultimo_update_id,
             },
         }
         testo = json.dumps(corpo, ensure_ascii=False, indent=2, sort_keys=False)

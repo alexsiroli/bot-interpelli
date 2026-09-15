@@ -46,7 +46,28 @@ A-041 · Scienze e tecnologie informatiche
 > le classi di concorso in `config.yaml` e vuoi ripartire pulito, cancella
 > `state/seen.json` e rilancia `--backfill`.
 
-## Comandi
+## Comandi nella chat Telegram
+
+Si scrivono direttamente al bot (c'e' anche il menu accanto alla casella di testo):
+
+| Comando | Cosa fa |
+|---|---|
+| `/digest` | gli interpelli di informatica **ancora aperti** gia' segnalati; a differenza del riepilogo automatico risponde anche quando non c'e' niente |
+| `/all` | **tutti** gli interpelli degli ultimi 7 giorni, anche di altre classi di concorso, una riga ciascuno con il titolo cliccabile |
+| `/stato` | province monitorate, quanti post in memoria, data dell'ultimo riepilogo |
+| `/aiuto` | elenco dei comandi |
+
+Il bot non ha un server in ascolto: i comandi vengono letti da un workflow schedulato
+**ogni 30 minuti** fra le 7:00 e le 20:30 (piu' a ogni controllo interpelli), quindi la
+risposta puo' tardare fino a mezz'ora. Telegram tiene i messaggi in coda 24 ore, quindi
+un comando scritto di notte viene servito al mattino. Per risposte immediate si lancia
+sul PC `python -m interpelli.main --ascolta`, che resta in long polling finche' non si
+preme Ctrl+C.
+
+Risponde **solo** alla chat indicata in `TELEGRAM_CHAT_ID`: chiunque altro scriva al bot
+viene ignorato. Il menu dei comandi si (ri)registra con `--test-telegram`.
+
+## Comandi da riga di comando
 
 ```bash
 python -m interpelli.main --check           # run normale: cerca e invia
@@ -54,6 +75,8 @@ python -m interpelli.main --dry-run         # stampa a video, non invia, non sal
 python -m interpelli.main --backfill        # marca tutto come visto senza inviare (una volta sola)
 python -m interpelli.main --test-telegram   # messaggio di prova
 python -m interpelli.main --discover        # ricognizione: che metodo e che URL usa ogni sito
+python -m interpelli.main --comandi         # esegue i comandi arrivati in chat (una passata)
+python -m interpelli.main --ascolta         # risponde ai comandi in tempo reale, sul PC
 python -m interpelli.main --check --provincia ravenna -v  # debug su una sola provincia
 ```
 
@@ -145,9 +168,13 @@ fastidio, aggiungi `'\ba[-\s]?0?66\b'` alle `esclusioni`.
      al posto del `GITHUB_TOKEN` e i suoi commit contano come attivita';
   2. oppure, quando arriva la mail di preavviso di GitHub, lanciare a mano
      `gh workflow run "Controllo interpelli"` o fare un commit qualsiasi.
-- **Consumo Actions.** Sei run al giorno da ~30 secondi: ~100 minuti al mese, dentro i
-  2000 gratuiti dei repository privati.
-- **Test.** `python -m pytest` (109 test). Le fixture in `tests/fixtures/` sono risposte
+- **Consumo Actions.** Sei controlli al giorno piu' il polling dei comandi ogni 30 minuti
+  in fascia diurna: circa 900 minuti al mese sui 2000 gratuiti dei repository privati.
+  Ogni run e' fatturato arrotondato al minuto, quindi il costo dipende dalla **frequenza**,
+  non dalla durata: per rispondere ai comandi piu' in fretta basta stringere il cron di
+  `comandi.yml`, tenendo d'occhio quel budget (`gh api /repos/:owner/:repo/actions/billing`
+  oppure Settings -> Billing).
+- **Test.** `python -m pytest` (125 test). Le fixture in `tests/fixtures/` sono risposte
   vere dei siti scaricate il 15/09/2026, compresi i casi che devono essere **scartati**
   (A-042, A-044, BI02, graduatoria DSGA) e due interpelli A-041 veri.
 
@@ -156,6 +183,7 @@ fastidio, aggiungi `'\ba[-\s]?0?66\b'` alle `esclusioni`.
 ```
 config.yaml                     province, classi di concorso, parametri
 interpelli/
+  comandi.py                    comandi della chat: /digest, /all, /stato, /aiuto
   config.py                     caricamento config e segreti
   fetch.py                      REST API, feed di categoria, feed generale
   filters.py                    normalizzazione del testo e match delle classi
@@ -165,7 +193,7 @@ interpelli/
   main.py                       CLI e orchestrazione
 state/seen.json                 memoria del bot, committata dal workflow
 tests/                          pytest + fixture di post reali
-.github/workflows/              interpelli.yml (cron) e ci.yml (test)
+.github/workflows/              interpelli.yml (controlli), comandi.yml (chat), ci.yml (test)
 SPEC-bot-interpelli.md          la specifica di partenza
 ```
 
