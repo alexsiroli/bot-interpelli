@@ -1,0 +1,15 @@
+# Segreti: il token del bot non entra MAI nel repository
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store

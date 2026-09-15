@@ -1,0 +1,6 @@
+requests>=2.31
+feedparser>=6.0
+PyYAML>=6.0
+# Su Windows zoneinfo non trova il database dei fusi senza questo pacchetto
+# (ZoneInfoNotFoundError su "Europe/Rome"). Su Linux/CI e' innocuo.
+tzdata>=2024.1

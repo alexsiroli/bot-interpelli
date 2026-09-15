@@ -1,0 +1,59 @@
+name: Controllo interpelli
+
+on:
+  schedule:
+    # ATTENZIONE: il cron di GitHub Actions e' in UTC.
+    # 5,8,11,14,17 UTC = 7/10/13/16/19 ora legale italiana (CEST).
+    # D'inverno (CET) gli stessi orari diventano 6/9/12/15/18: va benissimo lo stesso,
+    # non c'e' nessuna logica che dipenda dall'orario esatto di esecuzione.
+    # GitHub puo' inoltre ritardare i job schedulati di parecchi minuti negli orari di punta.
+    - cron: "0 5,8,11,14,17 * * *"
+  workflow_dispatch:
+
+# Un run alla volta: due run sovrapposti si darebbero battaglia sul commit di seen.json.
+concurrency:
+  group: interpelli
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  controlla:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Se e' configurato un PAT (secret STATE_PUSH_TOKEN) si usa quello: i commit
+          # fatti con GITHUB_TOKEN non contano come attivita' del repository, e dopo
+          # 60 giorni GitHub disattiva i workflow schedulati. Vedi README.
+          token: ${{ secrets.STATE_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installa le dipendenze
+        run: pip install -r requirements.txt
+
+      - name: Cerca nuovi interpelli e manda gli avvisi
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m interpelli.main --check
+
+      - name: Committa lo stato aggiornato
+        # always(): anche se un invio e' fallito, lo stato salvato va conservato.
+        if: always()
+        run: |
+          if git diff --quiet -- state/seen.json; then
+            echo "Nessuna modifica allo stato."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/seen.json
+          git commit -m "chore(stato): aggiorna gli interpelli gia' visti [skip ci]"
+          git push

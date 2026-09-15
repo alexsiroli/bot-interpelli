@@ -1,0 +1,74 @@
+# Configurazione del bot interpelli.
+# Tutto cio' che cambia nel tempo (province, categorie, classi di concorso) sta qui:
+# la logica in interpelli/ non contiene nulla di specifico per un sito o per una classe.
+
+http:
+  # Timeout esplicito per ogni richiesta (secondi). La spec chiede 10s.
+  timeout: 10
+  # Numero di ritentativi con backoff esponenziale sugli errori di rete/5xx.
+  retry: 2
+  backoff: 1.0
+  # User-Agent identificabile: se qualcuno all'USR guarda i log, deve capire chi siamo.
+  user_agent: "bot-interpelli/1.0 (+https://github.com/alexsiroli/bot-interpelli)"
+  # Quanti post leggere per provincia a ogni giro. 20 e' abbondante anche per Modena,
+  # che e' la provincia piu' prolifica (~70 post/mese).
+  max_post_per_provincia: 20
+
+esecuzione:
+  fuso: "Europe/Rome"
+  # Le voci di seen.json piu' vecchie di tot mesi vengono eliminate.
+  ritenzione_mesi: 12
+  # Dopo quanti run consecutivi a zero post di una provincia scatta l'allerta
+  # "il sito e' cambiato / non risponde piu'". Serve contro il fallimento silenzioso.
+  run_vuoti_prima_di_allerta: 3
+  # Ora italiana a partire dalla quale il primo run della giornata manda il digest.
+  ora_digest: 7
+
+province:
+  # categoria_preferita: regex (case-insensitive) sul NOME della categoria WordPress.
+  # Se non matcha nulla si ripiega sulla categoria "interpelli" con id piu' alto
+  # (vedi interpelli/fetch.py:risolvi_categoria), cosi' a settembre, quando l'USR
+  # crea la categoria del nuovo anno scolastico, il bot la prende da solo.
+  - nome: "Forli-Cesena"
+    base_url: "https://fc.istruzioneer.gov.it"
+    attiva: true
+  - nome: "Rimini"
+    base_url: "https://rn.istruzioneer.gov.it"
+    attiva: true
+  - nome: "Ravenna"
+    base_url: "https://ra.istruzioneer.gov.it"
+    # Ravenna ha una sola categoria "Interpelli" (slug "inter") senza suddivisione per anno.
+    attiva: true
+  - nome: "Bologna"
+    base_url: "https://bo.istruzioneer.gov.it"
+    # Al 2026-09-15 Bologna non ha ancora creato la categoria 2026/27: si usa la 2025/26
+    # finche' non compare quella nuova.
+    attiva: true
+  - nome: "Modena"
+    base_url: "https://mo.istruzioneer.gov.it"
+    attiva: true
+
+# Regex usate per decidere se un post riguarda le classi di concorso di informatica.
+# Il testo viene prima normalizzato (tag HTML rimossi, entita' decodificate, accenti
+# tolti, tutto minuscolo), quindi le regex si scrivono senza accenti e senza case.
+classi_di_concorso:
+  codici:
+    # A-041 Scienze e tecnologie informatiche (docente di teoria).
+    # Varianti viste sui siti: A041, A-041, A 041, A41, A-41.
+    - '\ba[-\s]?0?41\b'
+    # B-016 Laboratorio di scienze e tecnologie informatiche (ITP).
+    # Varianti: B016, B-016, B 016, B16, B-16.
+    - '\bb[-\s]?0?16\b'
+  parole:
+    # "informatic" copre informatica / informatiche / informatico.
+    - 'informatic'
+    - 'sistemi e reti'
+    - 'tecnologie informatiche'
+  # Regex che, se matchano, scartano il post ANCHE se una delle precedenti ha fatto match.
+  # Vuoto di default. Esempio d'uso: '\ba[-\s]?0?66\b' per escludere la A-066
+  # (Trattamento testi e dati), che cita spesso "informatica" pur non essendo A-041/B-016.
+  esclusioni: []
+
+telegram:
+  # Limite duro dell'API di Telegram: i messaggi piu' lunghi vengono spezzati.
+  max_caratteri: 4096
