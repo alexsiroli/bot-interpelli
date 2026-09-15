@@ -39,14 +39,17 @@ province:
     base_url: "https://ra.istruzioneer.gov.it"
     # Ravenna ha una sola categoria "Interpelli" (slug "inter") senza suddivisione per anno.
     attiva: true
+  # Bologna e Modena sono configurate ma SPENTE (scelta del 15/09/2026): troppo lontane,
+  # e Modena da sola pubblica piu' post di tutte le altre messe insieme. Per riaccenderne
+  # una basta rimettere attiva: true e lanciare --backfill, cosi' non arriva lo storico.
   - nome: "Bologna"
     base_url: "https://bo.istruzioneer.gov.it"
     # Al 2026-09-15 Bologna non ha ancora creato la categoria 2026/27: si usa la 2025/26
     # finche' non compare quella nuova.
-    attiva: true
+    attiva: false
   - nome: "Modena"
     base_url: "https://mo.istruzioneer.gov.it"
-    attiva: true
+    attiva: false
 
 # Regex usate per decidere se un post riguarda le classi di concorso di informatica.
 # Il testo viene prima normalizzato (tag HTML rimossi, entita' decodificate, accenti

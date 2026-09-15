@@ -1,7 +1,7 @@
 # bot-interpelli
 
-Bot Telegram che controlla ogni 2-3 ore i siti degli Uffici Scolastici Territoriali
-dell'Emilia-Romagna e avvisa quando esce un **interpello per le classi di concorso di
+Bot Telegram che controlla ogni 2-3 ore i siti degli Uffici Scolastici Territoriali di
+**Forli-Cesena, Rimini e Ravenna** e avvisa quando esce un **interpello per le classi di concorso di
 informatica** (A-041 e B-016), con scadenza, ore, sede e link al PDF.
 
 Gira su GitHub Actions: nessun server, nessun costo, nessun database (lo stato e' un file
@@ -53,7 +53,7 @@ python -m interpelli.main --dry-run         # stampa a video, non invia, non sal
 python -m interpelli.main --backfill        # marca tutto come visto senza inviare (una volta sola)
 python -m interpelli.main --test-telegram   # messaggio di prova
 python -m interpelli.main --discover        # ricognizione: che metodo e che URL usa ogni sito
-python -m interpelli.main --check --provincia modena -v   # debug su una sola provincia
+python -m interpelli.main --check --provincia ravenna -v  # debug su una sola provincia
 ```
 
 In locale servono le dipendenze (`pip install -r requirements-dev.txt`) e un file `.env`
@@ -85,15 +85,20 @@ copiato da `.env.example`. Il `.env` e' in `.gitignore` e il token non viene mai
 Tutte e cinque le province hanno le REST API attive, quindi i fallback RSS non vengono
 mai usati oggi. Rilanciare `--discover` quando qualcosa smette di funzionare.
 
-| Provincia | Sito | Categoria usata | Note |
-|---|---|---|---|
-| Forli-Cesena | `fc.istruzioneer.gov.it` | 720 `Interpelli a.s. 2026/27` | post con testo completo |
-| Rimini | `rn.istruzioneer.gov.it` | 452 `Interpelli docenti 2026/2027` | feed annidato sotto `/category/personale-docente/` |
-| Ravenna | `ra.istruzioneer.gov.it` | 204 `Interpelli` | categoria unica senza anno, contiene anche ATA/DSGA |
-| Bologna | `bo.istruzioneer.gov.it` | 1156 `Interpelli personale docente 2025/26` | la categoria 2026/27 non esiste ancora |
-| Modena | `mo.istruzioneer.gov.it` | 2470 `Interpelli personale docente 2026/27` | provincia piu' prolifica (~70 post/mese) |
+| Provincia | Sito | Categoria usata | Stato | Note |
+|---|---|---|---|---|
+| Forli-Cesena | `fc.istruzioneer.gov.it` | 720 `Interpelli a.s. 2026/27` | attiva | post con testo completo |
+| Rimini | `rn.istruzioneer.gov.it` | 452 `Interpelli docenti 2026/2027` | attiva | feed annidato sotto `/category/personale-docente/` |
+| Ravenna | `ra.istruzioneer.gov.it` | 204 `Interpelli` | attiva | categoria unica senza anno, contiene anche ATA/DSGA |
+| Bologna | `bo.istruzioneer.gov.it` | 1156 `Interpelli personale docente 2025/26` | **spenta** | la categoria 2026/27 non esiste ancora |
+| Modena | `mo.istruzioneer.gov.it` | 2470 `Interpelli personale docente 2026/27` | **spenta** | provincia piu' prolifica (~70 post/mese) |
 
-Molti post di Modena, Ravenna e Bologna contengono solo il link al PDF: in quei casi i
+Bologna e Modena restano in `config.yaml` con `attiva: false`: sono gia' configurate e
+verificate, ma non vengono interrogate. Per riaccenderne una: `attiva: true` e poi
+`python -m interpelli.main --backfill --provincia <nome>`, altrimenti al primo giro
+arriverebbe tutto lo storico gia' pubblicato.
+
+Molti post di Ravenna (e di Modena e Bologna, se le riaccendi) contengono solo il link al PDF: in quei casi i
 campi che il bot non trova nel testo restano `—`, e il PDF va aperto a mano. Il bot non
 scarica ne' analizza i PDF.
 
