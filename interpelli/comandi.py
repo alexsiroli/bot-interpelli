@@ -20,7 +20,7 @@ from .config import Config
 from .fetch import Post, crea_sessione, recupera
 from .parse import MANCANTE, estrai_classe_e_disciplina, testo_piano
 from .state import Stato
-from .telegram import Telegram, componi_digest, esc
+from .telegram import Telegram, componi_digest, componi_digest_vuoto, esc
 
 log = logging.getLogger(__name__)
 

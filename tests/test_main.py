@@ -19,6 +19,16 @@ URL_TELEGRAM = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
 BASE = "https://fc.istruzioneer.gov.it"
 
 
+def senza_digest(conf):
+    """Esecuzione con il digest spento.
+
+    Serve a rendere i test indipendenti dall'ora in cui girano: con il digest attivo il
+    numero di messaggi inviati cambierebbe a seconda che siano le 12 o le 14 di un
+    mercoledi. Il digest ha i suoi test dedicati, qui si misura altro.
+    """
+    return {**conf.esecuzione, "digest_anche_vuoto": False, "ora_digest": 99}
+
+
 @pytest.fixture
 def stato_temporaneo(tmp_path, monkeypatch):
     percorso = tmp_path / "seen.json"
@@ -38,7 +48,7 @@ def config_una_provincia(conf):
     return Config(
         province=[Provincia(nome="Forli-Cesena", base_url=BASE)],
         http=conf.http,
-        esecuzione=conf.esecuzione,
+        esecuzione=senza_digest(conf),
         classi_di_concorso=conf.classi_di_concorso,
         telegram=conf.telegram,
     )
@@ -142,7 +152,7 @@ def test_provincia_rotta_non_ferma_il_run(conf, stato_temporaneo, segreti):
     config = Config(
         province=[rotta, Provincia(nome="Forli-Cesena", base_url=BASE)],
         http=conf.http,
-        esecuzione=conf.esecuzione,
+        esecuzione=senza_digest(conf),
         classi_di_concorso=conf.classi_di_concorso,
         telegram=conf.telegram,
     )
@@ -155,3 +165,40 @@ def test_provincia_rotta_non_ferma_il_run(conf, stato_temporaneo, segreti):
 
     assert codice == 0
     assert Stato.carica(stato_temporaneo).e_visto("forli-cesena:28301")
+
+
+def _config_digest(conf, anche_vuoto):
+    """Config con il digest sempre dovuto (ora 0, nessun vincolo di giorno)."""
+    return Config(
+        province=[Provincia(nome="Forli-Cesena", base_url=BASE)],
+        http=conf.http,
+        esecuzione={**conf.esecuzione, "ora_digest": 0, "giorni_digest": None,
+                    "digest_anche_vuoto": anche_vuoto},
+        classi_di_concorso=conf.classi_di_concorso,
+        telegram=conf.telegram,
+    )
+
+
+@responses.activate
+def test_digest_vuoto_manda_la_conferma_giornaliera(conf, stato_temporaneo, segreti):
+    """Con digest_anche_vuoto il bot scrive anche quando non c'e' nessun interpello aperto."""
+    config = _config_digest(conf, anche_vuoto=True)
+    mock_sito(["post_fc_31512_a042.json"])  # A042: non passa il filtro, niente di nuovo
+    responses.add(responses.POST, URL_TELEGRAM, json={"ok": True}, status=200)
+
+    modulo_main.comando_run(config, config.province, "check")
+
+    invii = [c for c in responses.calls if c.request.url.startswith(URL_TELEGRAM)]
+    assert len(invii) == 1
+    assert "Nessun" in invii[0].request.body.replace("%20", " ").replace("+", " ")
+
+
+@responses.activate
+def test_digest_vuoto_disattivato_resta_in_silenzio(conf, stato_temporaneo, segreti):
+    config = _config_digest(conf, anche_vuoto=False)
+    mock_sito(["post_fc_31512_a042.json"])
+    responses.add(responses.POST, URL_TELEGRAM, json={"ok": True}, status=200)
+
+    modulo_main.comando_run(config, config.province, "check")
+
+    assert not [c for c in responses.calls if c.request.url.startswith(URL_TELEGRAM)]

@@ -2,17 +2,16 @@ name: Comandi in chat
 
 on:
   schedule:
-    # Ogni 30 minuti dalle 5 alle 18 UTC = 7:00-20:30 italiane d'estate (6:00-19:30 d'inverno).
-    # Fuori da questa fascia i comandi restano in coda su Telegram e vengono serviti al
-    # primo giro utile: Telegram li conserva 24 ore.
-    # Perche' 30 minuti e non 5: ogni run di Actions e' fatturato arrotondato al minuto,
-    # quindi la frequenza e' il costo. 30 minuti = ~26 run al giorno = ~780 minuti al mese,
-    # che stanno nei 2000 gratuiti insieme al workflow di controllo.
-    - cron: "*/30 5-18 * * *"
+    # Ogni 5 minuti, che e' il minimo consentito da GitHub.
+    # Sul repository pubblico i minuti di Actions sono illimitati, quindi la frequenza
+    # non costa nulla. Serve fitta perche' GitHub esegue i job schedulati "best effort":
+    # sotto carico li ritarda o li salta, e con uno slot ogni 5 minuti basta che ne passi
+    # uno qualsiasi perche' il comando venga servito in fretta.
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 concurrency:
-  group: stato-bot
+  group: comandi-chat
   cancel-in-progress: false
 
 permissions:
@@ -52,7 +51,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/seen.json
           git commit -m "chore(stato): comandi elaborati [skip ci]"
-          # I due workflow possono scrivere sullo stesso file a pochi secondi di distanza:
-          # si riallinea prima di spingere, invece di far fallire il run.
-          git pull --rebase --autostash origin main
-          git push
+          # I due workflow schedulati possono scrivere lo stato quasi in contemporanea.
+          # Se il riallineamento non riesce non si fa fallire il run: lo stato verra'
+          # ripreso al giro successivo, che e' sempre pochi minuti dopo.
+          if ! git pull --rebase --autostash origin main; then
+            git rebase --abort || true
+            echo "::warning::riallineamento fallito, stato non spinto: ci riprova il prossimo run"
+            exit 0
+          fi
+          git push || echo "::warning::push fallito, ci riprova il prossimo run"

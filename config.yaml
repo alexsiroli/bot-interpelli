@@ -27,6 +27,10 @@ esecuzione:
   # riepilogo. Gli avvisi sui nuovi interpelli arrivano comunque tutti i giorni, perche'
   # un interpello pubblicato di sabato spesso scade il lunedi mattina.
   giorni_digest: [1, 2, 3, 4, 5]
+  # Se true il digest arriva anche quando non c'e' nessun interpello aperto: e' la
+  # conferma giornaliera che il bot sta girando davvero. Messo a true dopo che GitHub
+  # ha saltato diversi run schedulati e il silenzio sembrava un guasto.
+  digest_anche_vuoto: true
 
 province:
   # categoria_preferita: regex (case-insensitive) sul NOME della categoria WordPress.

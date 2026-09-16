@@ -74,6 +74,20 @@ def componi_digest(aperti: list[dict[str, Any]], adesso: datetime) -> str:
     return "\n".join(righe)
 
 
+def componi_digest_vuoto(adesso: datetime) -> str:
+    """Il riepilogo quando non c'e' nessun interpello aperto.
+
+    Serve a due cose: rispondere a chi scrive /digest, e dare la conferma giornaliera
+    che il bot sta girando (i run schedulati di GitHub ogni tanto saltano, e senza
+    questo messaggio il silenzio sarebbe indistinguibile da un guasto).
+    """
+    return (
+        "📋 <b>Nessun interpello di informatica aperto</b>\n"
+        f"Controllato adesso, {adesso.strftime('%d/%m alle %H:%M')}. "
+        "Appena ne esce uno te lo mando subito."
+    )
+
+
 def componi_allerta(provincia: str, run_vuoti: int) -> str:
     """Allerta sul fallimento silenzioso: un feed che non restituisce piu' nulla."""
     return (

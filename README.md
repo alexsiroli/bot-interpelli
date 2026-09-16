@@ -38,8 +38,7 @@ A-041 · Scienze e tecnologie informatiche
    gh workflow run "Controllo interpelli"   # oppure, in locale, con il .env:
    python -m interpelli.main --test-telegram
    ```
-5. **Fatto.** Il workflow gira da solo sei volte al giorno (7, 10, 13, 14, 16, 19 ora
-   legale italiana; d'inverno un'ora prima) e il riepilogo arriva alle 13:00 nei giorni feriali.
+5. **Fatto.** Il controllo gira ogni ora e il riepilogo arriva alle 13:00 nei giorni feriali.
 
 > Il primo allineamento (`--backfill`) e' gia' stato fatto: gli interpelli pubblicati
 > prima dell'installazione sono marcati come visti e non verranno rimandati. Se cambi
@@ -58,11 +57,10 @@ Si scrivono direttamente al bot (c'e' anche il menu accanto alla casella di test
 | `/aiuto` | elenco dei comandi |
 
 Il bot non ha un server in ascolto: i comandi vengono letti da un workflow schedulato
-**ogni 30 minuti** fra le 7:00 e le 20:30 (piu' a ogni controllo interpelli), quindi la
-risposta puo' tardare fino a mezz'ora. Telegram tiene i messaggi in coda 24 ore, quindi
-un comando scritto di notte viene servito al mattino. Per risposte immediate si lancia
-sul PC `python -m interpelli.main --ascolta`, che resta in long polling finche' non si
-preme Ctrl+C.
+**ogni 5 minuti** (piu' a ogni controllo interpelli). Telegram tiene i messaggi in coda
+24 ore, quindi nessun comando va perso anche se GitHub salta qualche run. Per risposte
+immediate si lancia sul PC `python -m interpelli.main --ascolta`, che resta in long
+polling finche' non si preme Ctrl+C.
 
 Risponde **solo** alla chat indicata in `TELEGRAM_CHAT_ID`: chiunque altro scriva al bot
 viene ignorato. Il menu dei comandi si (ri)registra con `--test-telegram`.
@@ -102,10 +100,10 @@ copiato da `.env.example`. Il `.env` e' in `.gitignore` e il token non viene mai
    promemoria, quindi lo stesso interpello ricompare finche' la sua scadenza non passa.
    Quelli di cui il bot non riesce a leggere la scadenza restano in lista 7 giorni.
    Nel weekend il digest non parte (gli avvisi sui nuovi interpelli si', tutti i giorni).
-   Se non c'e' niente di aperto e niente di nuovo, il bot tace: nessun messaggio
-   "nessuna novita'". Ora e giorni si cambiano in `config.yaml` (`ora_digest`,
-   `giorni_digest`); il cron include apposta sia le 11 che le 12 UTC perche' le 13:00
-   italiane cadano giuste sia con l'ora legale sia con quella solare.
+   Con `digest_anche_vuoto: true` il messaggio arriva **anche quando non c'e' niente di
+   aperto**: e' la conferma giornaliera che il bot ha girato davvero. Ora, giorni e
+   comportamento a vuoto si cambiano in `config.yaml` (`ora_digest`, `giorni_digest`,
+   `digest_anche_vuoto`).
 6. **Allerta.** Se una provincia non restituisce piu' nessun post per 3 run consecutivi
    arriva un avviso: il fallimento silenzioso (sito cambiato, categoria rinominata) e' il
    rischio peggiore per un bot come questo.
@@ -168,13 +166,14 @@ fastidio, aggiungi `'\ba[-\s]?0?66\b'` alle `esclusioni`.
      al posto del `GITHUB_TOKEN` e i suoi commit contano come attivita';
   2. oppure, quando arriva la mail di preavviso di GitHub, lanciare a mano
      `gh workflow run "Controllo interpelli"` o fare un commit qualsiasi.
-- **Consumo Actions.** Sei controlli al giorno piu' il polling dei comandi ogni 30 minuti
-  in fascia diurna: circa 900 minuti al mese sui 2000 gratuiti dei repository privati.
-  Ogni run e' fatturato arrotondato al minuto, quindi il costo dipende dalla **frequenza**,
-  non dalla durata: per rispondere ai comandi piu' in fretta basta stringere il cron di
-  `comandi.yml`, tenendo d'occhio quel budget (`gh api /repos/:owner/:repo/actions/billing`
-  oppure Settings -> Billing).
-- **Test.** `python -m pytest` (125 test). Le fixture in `tests/fixtures/` sono risposte
+- **Run schedulati saltati.** GitHub esegue i cron "best effort": sotto carico li ritarda
+  di ore o li salta del tutto. Misurato su questo repository quando era privato: su ~28
+  slot al giorno ne partivano 3. Il repository e' quindi **pubblico**, dove i minuti di
+  Actions sono illimitati: i comandi si interrogano ogni 5 minuti e il controllo ogni ora,
+  cosi' un buco si richiude da solo al giro dopo. Nessun comando va perso comunque, perche'
+  Telegram li tiene in coda 24 ore. Il digest e' legato all'ora, non al singolo run: parte
+  al primo controllo utile dopo le 13:00.
+- **Test.** `python -m pytest` (127 test). Le fixture in `tests/fixtures/` sono risposte
   vere dei siti scaricate il 15/09/2026, compresi i casi che devono essere **scartati**
   (A-042, A-044, BI02, graduatoria DSGA) e due interpelli A-041 veri.
 

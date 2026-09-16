@@ -24,7 +24,13 @@ from .fetch import Esito, crea_sessione, post_da_rest, recupera, risolvi_categor
 from .filters import FiltroClassi
 from .parse import Interpello, costruisci_interpello
 from .state import Stato
-from .telegram import Telegram, componi_allerta, componi_digest, componi_messaggio
+from .telegram import (
+    Telegram,
+    componi_allerta,
+    componi_digest,
+    componi_digest_vuoto,
+    componi_messaggio,
+)
 
 log = logging.getLogger("interpelli")
 
@@ -213,9 +219,20 @@ def comando_run(conf: Config, province: list[Provincia], modalita: str) -> int:
         giorni_digest = conf.esecuzione.get("giorni_digest") or None
         if stato.digest_dovuto(adesso, ora_digest, giorni_digest):
             aperti = [v for v in stato.aperti_non_scaduti(adesso) if v["chiave"] not in chiavi_di_oggi]
+            anche_vuoto = bool(conf.esecuzione.get("digest_anche_vuoto", False))
+            testo = ""
             if aperti:
-                log.info("digest del mattino: %d interpelli ancora aperti", len(aperti))
+                log.info("digest: %d interpelli ancora aperti", len(aperti))
                 testo = componi_digest(aperti, adesso)
+            elif anche_vuoto:
+                # Un messaggio al giorno anche a mani vuote: e' la conferma che il bot
+                # ha girato davvero, visto che GitHub qualche run schedulato lo salta.
+                log.info("digest: niente di aperto, mando la conferma giornaliera")
+                testo = componi_digest_vuoto(adesso)
+            else:
+                log.info("digest: niente di aperto, non mando nulla")
+
+            if testo:
                 if telegram is None:
                     print("-" * 72)
                     print(testo)
@@ -223,9 +240,6 @@ def comando_run(conf: Config, province: list[Provincia], modalita: str) -> int:
                     inviati += 1
                 else:
                     falliti += 1
-            else:
-                # Niente di aperto e niente di nuovo: silenzio, come chiede la spec.
-                log.info("digest del mattino: niente di aperto, non mando nulla")
             stato.segna_digest(adesso.date())
 
     # I comandi arrivati in chat si smaltiscono anche qui: non costa una riga di piu' di

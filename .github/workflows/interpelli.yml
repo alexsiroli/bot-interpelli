@@ -2,21 +2,20 @@ name: Controllo interpelli
 
 on:
   schedule:
-    # ATTENZIONE: il cron di GitHub Actions e' in UTC e non conosce l'ora legale.
-    #   estate (CEST, UTC+2): 5,8,11,12,14,17 UTC = 7 / 10 / 13 / 14 / 16 / 19 italiane
-    #   inverno (CET, UTC+1): gli stessi orari = 6 /  9 / 12 / 13 / 15 / 18 italiane
-    # Ci sono sia le 11 che le 12 UTC apposta: cosi' in entrambe le stagioni esiste un run
-    # esattamente alle 13:00 italiane, che e' l'orario del digest (config.yaml: ora_digest).
-    # Il digest parte al primo run dopo quell'ora, quindi non viene mandato due volte.
-    # GitHub puo' ritardare i job schedulati di parecchi minuti negli orari di punta:
-    # nessuna logica dipende dall'orario esatto di esecuzione.
-    - cron: "0 5,8,11,12,14,17 * * *"
+    # Ogni ora, ai minuti 10 (gli slot all'ora esatta sono i piu' congestionati e quindi
+    # i piu' ritardati da GitHub). Il cron e' in UTC, ma qui non importa: girando ogni ora
+    # c'e' sempre un run poco dopo le 13:00 italiane, sia con l'ora legale sia con quella
+    # solare, ed e' li' che parte il digest (config.yaml: ora_digest).
+    # GitHub esegue i job schedulati "best effort" e ogni tanto ne salta qualcuno: con un
+    # run ogni ora un buco si richiude da solo, e il digest parte al primo run utile.
+    - cron: "10 * * * *"
   workflow_dispatch:
 
-# Un run alla volta: due run sovrapposti si darebbero battaglia sul commit di seen.json.
-# Stesso gruppo del workflow dei comandi: scrivono entrambi su state/seen.json.
+# Un run alla volta per questo workflow. Gruppo SEPARATO da quello dei comandi: con un
+# gruppo condiviso, un run dei comandi (uno ogni 5 minuti) cancellerebbe il controllo
+# rimasto in coda, che e' esattamente la cosa da non perdere.
 concurrency:
-  group: stato-bot
+  group: controllo-interpelli
   cancel-in-progress: false
 
 permissions:
@@ -60,6 +59,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/seen.json
           git commit -m "chore(stato): aggiorna gli interpelli gia' visti [skip ci]"
-          # Il workflow dei comandi puo' aver spinto nel frattempo: ci si riallinea.
-          git pull --rebase --autostash origin main
-          git push
+          # I due workflow schedulati possono scrivere lo stato quasi in contemporanea.
+          # Se il riallineamento non riesce non si fa fallire il run: lo stato verra'
+          # ripreso al giro successivo, che e' sempre pochi minuti dopo.
+          if ! git pull --rebase --autostash origin main; then
+            git rebase --abort || true
+            echo "::warning::riallineamento fallito, stato non spinto: ci riprova il prossimo run"
+            exit 0
+          fi
+          git push || echo "::warning::push fallito, ci riprova il prossimo run"

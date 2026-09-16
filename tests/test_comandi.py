@@ -28,7 +28,7 @@ TOKEN = "123456:FINTO-TOKEN"
 INVIO = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
 UPDATES = f"https://api.telegram.org/bot{TOKEN}/getUpdates"
 BASE = "https://fc.istruzioneer.gov.it"
-CHAT = "111222333"
+CHAT = "111222333"  # chat id finta: quella vera sta solo nei secret
 
 
 @pytest.fixture
