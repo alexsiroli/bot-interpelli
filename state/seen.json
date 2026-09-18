@@ -25,6 +25,8 @@
     "forli-cesena:31499": "2026-09-15T14:35:38.135215+02:00",
     "forli-cesena:31512": "2026-09-15T14:35:38.135215+02:00",
     "forli-cesena:31599": "2026-09-15T14:35:38.135215+02:00",
+    "forli-cesena:31670": "2026-09-18T16:25:36.598533+02:00",
+    "forli-cesena:31678": "2026-09-18T16:25:36.598533+02:00",
     "modena:45606": "2026-09-15T14:35:38.135215+02:00",
     "modena:45609": "2026-09-15T14:35:38.135215+02:00",
     "modena:45612": "2026-09-15T14:35:38.135215+02:00",
@@ -68,9 +70,30 @@
     "rimini:20913": "2026-09-15T14:35:38.135215+02:00",
     "rimini:20920": "2026-09-15T14:35:38.135215+02:00"
   },
-  "aperti": {},
+  "aperti": {
+    "forli-cesena:31678": {
+      "provincia": "forli-cesena",
+      "titolo": "Interpello suppl. al 31.12.26 – c.d.c. A041 – h 8 spezz. – ITE R. Serra Cesena",
+      "link": "https://fc.istruzioneer.gov.it/2026/09/18/interpello-suppl-al-31-12-26-c-d-c-a041-h-8-spezz-ite-r-serra-cesena/",
+      "classe": "A-041",
+      "scuola": "ITE RENATO SERRA",
+      "ore": "8",
+      "scadenza": null,
+      "scadenza_testo": "—"
+    },
+    "forli-cesena:31670": {
+      "provincia": "forli-cesena",
+      "titolo": "Interpello suppl. al 30.06.27 – c.d.c. A041 – h 4 spezz. – ITE R. Serra Cesena",
+      "link": "https://fc.istruzioneer.gov.it/2026/09/18/interpello-suppl-c-d-c-a041-esaurimento-graduatorie-ite-r-serra-cesena/",
+      "classe": "A-041",
+      "scuola": "ITE RENATO SERRA",
+      "ore": "4",
+      "scadenza": null,
+      "scadenza_testo": "—"
+    }
+  },
   "meta": {
-    "ultimo_digest": "2026-09-17",
+    "ultimo_digest": "2026-09-18",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
