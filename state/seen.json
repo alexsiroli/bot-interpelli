@@ -27,6 +27,7 @@
     "forli-cesena:31599": "2026-09-15T14:35:38.135215+02:00",
     "forli-cesena:31670": "2026-09-18T16:25:36.598533+02:00",
     "forli-cesena:31678": "2026-09-18T16:25:36.598533+02:00",
+    "forli-cesena:31762": "2026-09-21T15:59:27.796180+02:00",
     "modena:45606": "2026-09-15T14:35:38.135215+02:00",
     "modena:45609": "2026-09-15T14:35:38.135215+02:00",
     "modena:45612": "2026-09-15T14:35:38.135215+02:00",
@@ -68,7 +69,8 @@
     "ravenna:44157": "2026-09-15T14:35:38.135215+02:00",
     "ravenna:44239": "2026-09-15T14:35:38.135215+02:00",
     "rimini:20913": "2026-09-15T14:35:38.135215+02:00",
-    "rimini:20920": "2026-09-15T14:35:38.135215+02:00"
+    "rimini:20920": "2026-09-15T14:35:38.135215+02:00",
+    "rimini:21026": "2026-09-21T15:59:27.796180+02:00"
   },
   "aperti": {
     "forli-cesena:31678": {
@@ -90,10 +92,30 @@
       "ore": "4",
       "scadenza": null,
       "scadenza_testo": "—"
+    },
+    "forli-cesena:31762": {
+      "provincia": "forli-cesena",
+      "titolo": "Interpello suppl. c.d.c. A041 al 30.06.27 – h 16 – ISIS L. Da Vinci Cesenatico",
+      "link": "https://fc.istruzioneer.gov.it/2026/09/21/interpello-suppl-c-d-c-a041-al-30-06-27-h-16-isis-l-da-vinci-cesenatico/",
+      "classe": "A-041",
+      "scuola": "IISS MARIE CURIE DI SAVIGNANO SUL RUBICONE",
+      "ore": "16",
+      "scadenza": null,
+      "scadenza_testo": "—"
+    },
+    "rimini:21026": {
+      "provincia": "rimini",
+      "titolo": "Docenti: interpello classi di concorso A041 – A042 – ISISS GUERRA di Novafeltria (RN)",
+      "link": "https://rn.istruzioneer.gov.it/2026/09/21/docenti-interpello-classi-di-concorso-a041-a042-isiss-guerra-di-novafeltria-rn/",
+      "classe": "A-041",
+      "scuola": "ISISS GUERRA di Novafeltria (RN)",
+      "ore": "—",
+      "scadenza": null,
+      "scadenza_testo": "—"
     }
   },
   "meta": {
-    "ultimo_digest": "2026-09-18",
+    "ultimo_digest": "2026-09-21",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
