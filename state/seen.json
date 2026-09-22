@@ -28,6 +28,7 @@
     "forli-cesena:31670": "2026-09-18T16:25:36.598533+02:00",
     "forli-cesena:31678": "2026-09-18T16:25:36.598533+02:00",
     "forli-cesena:31762": "2026-09-21T15:59:27.796180+02:00",
+    "forli-cesena:31779": "2026-09-22T11:52:48.143571+02:00",
     "modena:45606": "2026-09-15T14:35:38.135215+02:00",
     "modena:45609": "2026-09-15T14:35:38.135215+02:00",
     "modena:45612": "2026-09-15T14:35:38.135215+02:00",
@@ -110,6 +111,16 @@
       "classe": "A-041",
       "scuola": "ISISS GUERRA di Novafeltria (RN)",
       "ore": "—",
+      "scadenza": null,
+      "scadenza_testo": "—"
+    },
+    "forli-cesena:31779": {
+      "provincia": "forli-cesena",
+      "titolo": "Interpello suppl. dal 26.09 al 30.06 c.d.c. A041 – h 2 – Liceo Righi Cesena",
+      "link": "https://fc.istruzioneer.gov.it/2026/09/22/interpello-suppl-dal-26-09-al-30-06-c-d-c-a041-h-2-liceo-righi-cesena/",
+      "classe": "A-041",
+      "scuola": "Liceo Scientifico",
+      "ore": "2",
       "scadenza": null,
       "scadenza_testo": "—"
     }
