@@ -71,7 +71,8 @@
     "ravenna:44239": "2026-09-15T14:35:38.135215+02:00",
     "rimini:20913": "2026-09-15T14:35:38.135215+02:00",
     "rimini:20920": "2026-09-15T14:35:38.135215+02:00",
-    "rimini:21026": "2026-09-21T15:59:27.796180+02:00"
+    "rimini:21026": "2026-09-21T15:59:27.796180+02:00",
+    "rimini:21069": "2026-09-24T16:58:07.390198+02:00"
   },
   "aperti": {
     "forli-cesena:31678": {
@@ -123,10 +124,20 @@
       "ore": "2",
       "scadenza": null,
       "scadenza_testo": "—"
+    },
+    "rimini:21069": {
+      "provincia": "rimini",
+      "titolo": "Docenti: interpello classe di concorso A041 Scienze e tecnologie Informatiche – ITES Valturio – Rimini",
+      "link": "https://rn.istruzioneer.gov.it/2026/09/24/docenti-interpello-classe-di-concorso-a041-scienze-e-tecnologie-informatiche-ites-valturio-rimini/",
+      "classe": "A-041",
+      "scuola": "Rimini",
+      "ore": "11",
+      "scadenza": null,
+      "scadenza_testo": "—"
     }
   },
   "meta": {
-    "ultimo_digest": "2026-09-23",
+    "ultimo_digest": "2026-09-24",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
