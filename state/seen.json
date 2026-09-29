@@ -75,16 +75,6 @@
     "rimini:21069": "2026-09-24T16:58:07.390198+02:00"
   },
   "aperti": {
-    "forli-cesena:31779": {
-      "provincia": "forli-cesena",
-      "titolo": "Interpello suppl. dal 26.09 al 30.06 c.d.c. A041 – h 2 – Liceo Righi Cesena",
-      "link": "https://fc.istruzioneer.gov.it/2026/09/22/interpello-suppl-dal-26-09-al-30-06-c-d-c-a041-h-2-liceo-righi-cesena/",
-      "classe": "A-041",
-      "scuola": "Liceo Scientifico",
-      "ore": "2",
-      "scadenza": null,
-      "scadenza_testo": "—"
-    },
     "rimini:21069": {
       "provincia": "rimini",
       "titolo": "Docenti: interpello classe di concorso A041 Scienze e tecnologie Informatiche – ITES Valturio – Rimini",
@@ -97,7 +87,7 @@
     }
   },
   "meta": {
-    "ultimo_digest": "2026-09-28",
+    "ultimo_digest": "2026-09-29",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
