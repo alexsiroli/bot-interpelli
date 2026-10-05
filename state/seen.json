@@ -74,7 +74,8 @@
     "rimini:20920": "2026-09-15T14:35:38.135215+02:00",
     "rimini:21026": "2026-09-21T15:59:27.796180+02:00",
     "rimini:21069": "2026-09-24T16:58:07.390198+02:00",
-    "rimini:21170": "2026-09-30T21:10:25.351761+02:00"
+    "rimini:21170": "2026-09-30T21:10:25.351761+02:00",
+    "rimini:21193": "2026-10-05T17:55:13.626009+02:00"
   },
   "aperti": {
     "rimini:21170": {
@@ -96,10 +97,20 @@
       "ore": "8",
       "scadenza": null,
       "scadenza_testo": "—"
+    },
+    "rimini:21193": {
+      "provincia": "rimini",
+      "titolo": "ITTS “BELLUZZI-DA VINCI” – Interpello per il conferimento di n. 1 supplenza su classe di concorso A041 – n. 9 ore settimanali fino al 30/06/2027",
+      "link": "https://rn.istruzioneer.gov.it/2026/10/05/itts-belluzzi-da-vinci-interpello-per-il-conferimento-di-n-1-supplenza-su-classe-di-concorso-a041-n-9-ore-settimanali-fino-al-30-06-2027/",
+      "classe": "A-041",
+      "scuola": "n. 9 ore settimanali fino al 30/06/2027",
+      "ore": "9",
+      "scadenza": null,
+      "scadenza_testo": "—"
     }
   },
   "meta": {
-    "ultimo_digest": "2026-10-02",
+    "ultimo_digest": "2026-10-05",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
