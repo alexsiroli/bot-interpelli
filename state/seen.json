@@ -29,6 +29,7 @@
     "forli-cesena:31678": "2026-09-18T16:25:36.598533+02:00",
     "forli-cesena:31762": "2026-09-21T15:59:27.796180+02:00",
     "forli-cesena:31779": "2026-09-22T11:52:48.143571+02:00",
+    "forli-cesena:32078": "2026-10-05T08:55:30.796196+02:00",
     "modena:45606": "2026-09-15T14:35:38.135215+02:00",
     "modena:45609": "2026-09-15T14:35:38.135215+02:00",
     "modena:45612": "2026-09-15T14:35:38.135215+02:00",
@@ -83,6 +84,16 @@
       "classe": "A-041",
       "scuola": "—",
       "ore": "—",
+      "scadenza": null,
+      "scadenza_testo": "—"
+    },
+    "forli-cesena:32078": {
+      "provincia": "forli-cesena",
+      "titolo": "Interpello supplenza al 30.06 c.d.c. A041 – h 8 – I.S. Pascal Comandini",
+      "link": "https://fc.istruzioneer.gov.it/2026/10/05/interpello-supplenza-al-30-06-c-d-c-a041-h-8-i-s-pascal-comandini/",
+      "classe": "A-041",
+      "scuola": "ITI Pascal",
+      "ore": "8",
       "scadenza": null,
       "scadenza_testo": "—"
     }
