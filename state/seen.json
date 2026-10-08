@@ -30,6 +30,7 @@
     "forli-cesena:31762": "2026-09-21T15:59:27.796180+02:00",
     "forli-cesena:31779": "2026-09-22T11:52:48.143571+02:00",
     "forli-cesena:32078": "2026-10-05T08:55:30.796196+02:00",
+    "forli-cesena:32156": "2026-10-08T18:24:27.977923+02:00",
     "modena:45606": "2026-09-15T14:35:38.135215+02:00",
     "modena:45609": "2026-09-15T14:35:38.135215+02:00",
     "modena:45612": "2026-09-15T14:35:38.135215+02:00",
@@ -97,10 +98,20 @@
       "ore": "9",
       "scadenza": null,
       "scadenza_testo": "—"
+    },
+    "forli-cesena:32156": {
+      "provincia": "forli-cesena",
+      "titolo": "Interpello supplenza breve c.d.c. A026 – h 18 – Liceo Scientifico “Righi”",
+      "link": "https://fc.istruzioneer.gov.it/2026/10/08/interpello-supplenza-breve-c-d-c-a026-liceo-scientifico-righi/",
+      "classe": "A-026",
+      "scuola": "Liceo Scientifico",
+      "ore": "18",
+      "scadenza": null,
+      "scadenza_testo": "—"
     }
   },
   "meta": {
-    "ultimo_digest": "2026-10-07",
+    "ultimo_digest": "2026-10-08",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
