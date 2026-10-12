@@ -31,6 +31,7 @@
     "forli-cesena:31779": "2026-09-22T11:52:48.143571+02:00",
     "forli-cesena:32078": "2026-10-05T08:55:30.796196+02:00",
     "forli-cesena:32156": "2026-10-08T18:24:27.977923+02:00",
+    "forli-cesena:32227": "2026-10-12T19:47:40.204246+02:00",
     "modena:45606": "2026-09-15T14:35:38.135215+02:00",
     "modena:45609": "2026-09-15T14:35:38.135215+02:00",
     "modena:45612": "2026-09-15T14:35:38.135215+02:00",
@@ -79,16 +80,6 @@
     "rimini:21193": "2026-10-05T17:55:13.626009+02:00"
   },
   "aperti": {
-    "rimini:21193": {
-      "provincia": "rimini",
-      "titolo": "ITTS “BELLUZZI-DA VINCI” – Interpello per il conferimento di n. 1 supplenza su classe di concorso A041 – n. 9 ore settimanali fino al 30/06/2027",
-      "link": "https://rn.istruzioneer.gov.it/2026/10/05/itts-belluzzi-da-vinci-interpello-per-il-conferimento-di-n-1-supplenza-su-classe-di-concorso-a041-n-9-ore-settimanali-fino-al-30-06-2027/",
-      "classe": "A-041",
-      "scuola": "n. 9 ore settimanali fino al 30/06/2027",
-      "ore": "9",
-      "scadenza": null,
-      "scadenza_testo": "—"
-    },
     "forli-cesena:32156": {
       "provincia": "forli-cesena",
       "titolo": "Interpello supplenza breve c.d.c. A026 – h 18 – Liceo Scientifico “Righi”",
@@ -98,10 +89,20 @@
       "ore": "18",
       "scadenza": null,
       "scadenza_testo": "—"
+    },
+    "forli-cesena:32227": {
+      "provincia": "forli-cesena",
+      "titolo": "Interpello supplenza al 31.8.27 – c.d.c. A041 – h 18 – I.T.E. Matteucci",
+      "link": "https://fc.istruzioneer.gov.it/2026/10/12/interpello-supplenza-al-31-8-c-d-c-a041-h18-i-t-e-matteucci/",
+      "classe": "A-041",
+      "scuola": "I.T.E. Matteucci",
+      "ore": "18",
+      "scadenza": "2026-10-16T12:00:00+02:00",
+      "scadenza_testo": "entro e non oltre le ore 12:00 del 16 /10/2026"
     }
   },
   "meta": {
-    "ultimo_digest": "2026-10-09",
+    "ultimo_digest": "2026-10-12",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
