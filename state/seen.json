@@ -80,16 +80,6 @@
     "rimini:21193": "2026-10-05T17:55:13.626009+02:00"
   },
   "aperti": {
-    "forli-cesena:32156": {
-      "provincia": "forli-cesena",
-      "titolo": "Interpello supplenza breve c.d.c. A026 – h 18 – Liceo Scientifico “Righi”",
-      "link": "https://fc.istruzioneer.gov.it/2026/10/08/interpello-supplenza-breve-c-d-c-a026-liceo-scientifico-righi/",
-      "classe": "A-026",
-      "scuola": "Liceo Scientifico",
-      "ore": "18",
-      "scadenza": null,
-      "scadenza_testo": "—"
-    },
     "forli-cesena:32227": {
       "provincia": "forli-cesena",
       "titolo": "Interpello supplenza al 31.8.27 – c.d.c. A041 – h 18 – I.T.E. Matteucci",
