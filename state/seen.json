@@ -79,20 +79,9 @@
     "rimini:21170": "2026-09-30T21:10:25.351761+02:00",
     "rimini:21193": "2026-10-05T17:55:13.626009+02:00"
   },
-  "aperti": {
-    "forli-cesena:32227": {
-      "provincia": "forli-cesena",
-      "titolo": "Interpello supplenza al 31.8.27 – c.d.c. A041 – h 18 – I.T.E. Matteucci",
-      "link": "https://fc.istruzioneer.gov.it/2026/10/12/interpello-supplenza-al-31-8-c-d-c-a041-h18-i-t-e-matteucci/",
-      "classe": "A-041",
-      "scuola": "I.T.E. Matteucci",
-      "ore": "18",
-      "scadenza": "2026-10-16T12:00:00+02:00",
-      "scadenza_testo": "entro e non oltre le ore 12:00 del 16 /10/2026"
-    }
-  },
+  "aperti": {},
   "meta": {
-    "ultimo_digest": "2026-10-15",
+    "ultimo_digest": "2026-10-16",
     "run_vuoti": {
       "forli-cesena": 0,
       "rimini": 0,
